@@ -1,11 +1,14 @@
 package com.sty.xxt.xxtplugin.startactivity;
 
 import android.content.Context;
+import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.os.Environment;
 import android.util.Log;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import dalvik.system.DexClassLoader;
 
@@ -58,6 +61,6 @@ public class LoadUtils {
             Log.e("sty", "exception");
             e.printStackTrace();
         }
-
     }
+
 }

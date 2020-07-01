@@ -29,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 onBtnInvokeClicked();
+                Log.e("sty", "宿主 MainActivity getResources: " + getApplication());
+
 //                printClassLoader();
             }
         });
