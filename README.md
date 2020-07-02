@@ -72,3 +72,67 @@
 
 ![image](https://github.com/tianyalu/XxtPluginStartActivity/raw/master/show/start_plugin_activity_process.png)  
 
+
+
+## 三、版本适配
+
+![image-20200702212446863](/Users/tian/Library/Application Support/typora-user-images/image-20200702212446863.png)
+
+![image-20200702213248075](/Users/tian/Library/Application Support/typora-user-images/image-20200702213248075.png)
+
+Api 28 时序图
+
+![image-20200702213337360](/Users/tian/Library/Application Support/typora-user-images/image-20200702213337360.png)
+
+ActivityStackSupervisor.realstartActivityLocked --> ClientLifecycleManager.scheduleTransaction --> ClientTransaction.schedule --> IApplicationThread.scheduleTransaction --> EXECUTE_TRANSACTION = 159 | TransactionExecutor.execute --> executeCallbacks(transaction) --> ClientTransactionItem(LaunchActivityItem).execute
+
+
+
+
+
+8.0:
+
+ActivityClientRecord = msg.obj --> intent
+
+9.0: --> 封装
+
+ClientTransaction transaction = (ClientTransaction) msg.obj
+
+private Intent mIntent --> LaunchActivityItem的对象
+
+
+
+
+
+![image-20200702215923105](/Users/tian/Library/Application Support/typora-user-images/image-20200702215923105.png)
+
+![image-20200702220201118](/Users/tian/Library/Application Support/typora-user-images/image-20200702220201118.png)
+
+![image-20200702220233206](/Users/tian/Library/Application Support/typora-user-images/image-20200702220233206.png)
+
+![image-20200702220436857](/Users/tian/Library/Application Support/typora-user-images/image-20200702220436857.png)
+
+![image-20200702220606313](/Users/tian/Library/Application Support/typora-user-images/image-20200702220606313.png)
+
+getResource --> Resources
+
+Context --> Resources --> AssertManager
+
+Activity --> context
+
+Application --> context  两者不同
+
+ResourcesKey --> resDir == 资源目录
+
+//资源放到AssetManager里面 --> Hook点
+
+assets.addAssetPath(key.mResDir) -- 宿主的资源
+
+assets.addAssetPath(插件的资源) -- 插件的资源
+
+方案：是添加还是替换
+
+合并：插件+宿主 --> 冲突 --> AAPT
+
+创建：不会有冲突 --> 再创建一个AssetManager -->专门加载插件的资源  
+

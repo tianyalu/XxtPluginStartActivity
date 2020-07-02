@@ -1,6 +1,7 @@
 package com.sty.xxt.xxtplugin.startactivity;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
@@ -9,6 +10,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 
@@ -22,8 +24,16 @@ public class HookUtil {
         try {
             //private T mInstance --> mInstance的Field --> Singleton对象 --> IActivityManagerSingleton
             //Singleton对象
-            Class<?> clazz = Class.forName("android.app.ActivityManager");
-            Field iActivityManagerSingletonField = clazz.getDeclaredField("IActivityManagerSingleton");
+            //10.0又需要适配了
+            Field iActivityManagerSingletonField = null;
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                Class<?> clazz = Class.forName("android.app.ActivityManager");
+                iActivityManagerSingletonField = clazz.getDeclaredField("IActivityManagerSingleton");
+            }else {
+                Class<?> clazz = Class.forName("android.app.ActivityManagerNative");
+                iActivityManagerSingletonField = clazz.getDeclaredField("gDefault");
+            }
+
             iActivityManagerSingletonField.setAccessible(true);
             Object singleton = iActivityManagerSingletonField.get(null);
 
@@ -119,6 +129,35 @@ public class HookUtil {
                                 Intent intent = intentProxy.getParcelableExtra(TARGET_INTENT);
                                 if (intent != null) {
                                     intentField.set(msg.obj, intent);
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                        case 159:
+                            //ClientTransaction transaction = (ClientTransaction) msg.obj
+                            //LaunchActivityItem的对象
+                            Class<?> transactionClass = msg.obj.getClass();
+                            //private List<ClientTransactionItem> mActivityCallbacks;
+
+                            try {
+                                Field mActivityCallbacksField = transactionClass.getDeclaredField("mActivityCallbacks");
+                                mActivityCallbacksField.setAccessible(true);
+                                List list = (List) mActivityCallbacksField.get(msg.obj);
+                                for (int i = 0; i < list.size(); i++) {
+                                    //LaunchActivityItem的对象
+                                    if(list.get(i).getClass().getName().equals("android.app.servertransaction.LaunchActivityItem")) {
+                                        Object launchActivityItem = list.get(i);
+                                        //Intent
+                                        Field mIntentProxyField = launchActivityItem.getClass().getDeclaredField("mIntent");
+                                        mIntentProxyField.setAccessible(true);
+                                        Intent intentProxy = (Intent) mIntentProxyField.get(launchActivityItem);
+                                        //启动插件的Intent
+                                        Intent intent = intentProxy.getParcelableExtra(TARGET_INTENT);
+                                        if(intent != null) {
+                                            mIntentProxyField.set(msg.obj, intent);
+                                        }
+                                    }
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
