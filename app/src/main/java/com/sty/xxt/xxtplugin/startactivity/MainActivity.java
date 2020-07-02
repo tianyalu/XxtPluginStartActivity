@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -29,16 +31,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 onBtnInvokeClicked();
-//                printClassLoader();
             }
         });
+    }
+
+    private void onBtnInvokeClicked() {
+//        printClassLoader();
+//        invokePluginMethod();
+        startPluginActivity();
     }
 
     /**
      * 如果不合并插件dex的话会报如下错误：
      * System.err: java.lang.ClassNotFoundException: com.sty.xxt.childplugin.Test
      */
-    private void onBtnInvokeClicked() {
+    private void invokePluginMethod() {
         try {
             Class<?> clazz = Class.forName("com.sty.xxt.xxtplugin.childplugin.Test");
             Method print = clazz.getMethod("print");
@@ -65,5 +72,16 @@ public class MainActivity extends AppCompatActivity {
         //java.lang.BootClassLoader@9cf4a4
         Log.e("sty", "AppCompatActivity printClassLoader: " + AppCompatActivity.class.getClassLoader());
         //dalvik.system.PathClassLoader[DexPathList[[zip file "/data/app/com.sty.xxt.xxtplugin-HJYbcg7DCrmMkePA_SHGrQ==/base.apk"]
+    }
+
+    private void startPluginActivity() {
+//        startActivity(new Intent(MainActivity.this, ProxyActivity.class));
+//                                                 ↓ 反射替换
+//        startActivity(new Intent(MainActivity.this, SecondActivity.class));
+
+        //怎么让本来要启动的 plugin.MainActivity 变成启动 ProxyActivity
+        Intent intent = new Intent();
+        intent.setComponent(new ComponentName("com.sty.xxt.xxtplugin.childplugin", "com.sty.xxt.xxtplugin.childplugin.MainActivity"));
+        startActivity(intent);
     }
 }

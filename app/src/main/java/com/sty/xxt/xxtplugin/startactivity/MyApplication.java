@@ -7,5 +7,8 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         LoadUtils.loadClass(this);
+
+        HookUtil.hookAMS();
+        HookUtil.hookHandler();
     }
 }
