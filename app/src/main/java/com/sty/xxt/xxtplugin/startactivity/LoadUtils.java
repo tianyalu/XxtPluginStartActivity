@@ -1,11 +1,14 @@
 package com.sty.xxt.xxtplugin.startactivity;
 
 import android.content.Context;
+import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.os.Environment;
 import android.util.Log;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import dalvik.system.DexClassLoader;
 
@@ -55,9 +58,9 @@ public class LoadUtils {
             // hostPathList.dexElements = newElements
             dexElementsField.set(hostPathList, newElements);
         } catch (Exception e) {
-            Log.e("sty", "exception");
+            Log.e("sty", "exception----------->");
             e.printStackTrace();
         }
-
     }
+
 }

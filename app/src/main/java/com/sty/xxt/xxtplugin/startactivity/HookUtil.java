@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcelable;
+import android.util.Log;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
@@ -55,7 +55,9 @@ public class HookUtil {
                              *                         token, target != null ? target.mEmbeddedID : null,
                              *                         requestCode, 0, null, options);
                              */
+                            //todo 优化：判断如果是宿主包名的话就不用反射了
                             if ("startActivity".equals(method.getName())) {
+//                                Log.i("sty", "proxy method: " + method.getName());
                                 //修改intent
                                 int index = 0;
                                 for (int i = 0; i < args.length; i++) {
@@ -115,6 +117,8 @@ public class HookUtil {
             Handler.Callback callback = new Handler.Callback() {
                 @Override
                 public boolean handleMessage(@NonNull Message msg) {
+//                    Log.i("sty", "proxy handler message: " + msg.toString());
+                    //todo 优化：判断如果是宿主进程的话就不用反射了
                     switch (msg.what) {
                         //8.0
                         case 100:
@@ -134,6 +138,7 @@ public class HookUtil {
                                 e.printStackTrace();
                             }
                             break;
+                        //9.0
                         case 159:
                             //ClientTransaction transaction = (ClientTransaction) msg.obj
                             //LaunchActivityItem的对象
@@ -155,7 +160,7 @@ public class HookUtil {
                                         //启动插件的Intent
                                         Intent intent = intentProxy.getParcelableExtra(TARGET_INTENT);
                                         if(intent != null) {
-                                            mIntentProxyField.set(msg.obj, intent);
+                                            mIntentProxyField.set(launchActivityItem, intent);
                                         }
                                     }
                                 }

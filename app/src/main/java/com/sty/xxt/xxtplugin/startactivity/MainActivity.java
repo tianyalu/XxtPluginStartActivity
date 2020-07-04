@@ -1,5 +1,6 @@
 package com.sty.xxt.xxtplugin.startactivity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
@@ -16,6 +17,7 @@ import java.lang.reflect.Method;
 public class MainActivity extends AppCompatActivity {
     private String[] needPermissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
     private Button btnInvoke;
+    private Button btnSecondActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,20 +26,32 @@ public class MainActivity extends AppCompatActivity {
 
         if (!PermissionUtils.checkPermissions(this, needPermissions)) {
             PermissionUtils.requestPermissions(this, needPermissions);
+        }else {
+            //必须获取到存储权限之后才能调用！！！
+            LoadUtils.loadClass(this);
+            HookUtil.hookAMS();
+            HookUtil.hookHandler();
         }
 
         btnInvoke = findViewById(R.id.btn_invoke);
+        btnSecondActivity = findViewById(R.id.btn_second_activity);
         btnInvoke.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onBtnInvokeClicked();
             }
         });
+        btnSecondActivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, SecondActivity.class));
+            }
+        });
     }
 
     private void onBtnInvokeClicked() {
 //        printClassLoader();
-//        invokePluginMethod();
+        invokePluginMethod();
         startPluginActivity();
     }
 
@@ -83,5 +97,20 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent();
         intent.setComponent(new ComponentName("com.sty.xxt.xxtplugin.childplugin", "com.sty.xxt.xxtplugin.childplugin.MainActivity"));
         startActivity(intent);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (requestCode == PermissionUtils.REQUEST_PERMISSIONS_CODE) {
+            if (!PermissionUtils.verifyPermissions(grantResults)) {
+                PermissionUtils.showMissingPermissionDialog(this);
+            } else {
+                //必须获取到存储权限之后才能调用！！！
+                LoadUtils.loadClass(this);
+                HookUtil.hookAMS();
+                HookUtil.hookHandler();
+            }
+        }
     }
 }

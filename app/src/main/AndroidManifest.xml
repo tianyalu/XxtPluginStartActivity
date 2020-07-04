@@ -21,6 +21,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ProxyActivity" />
+        <activity android:name=".SecondActivity" />
     </application>
 
 </manifest>

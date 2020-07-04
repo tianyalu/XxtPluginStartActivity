@@ -1,3 +1,5 @@
+
+
 # 360插件化之宿主启动插件Activity
 
 [TOC]
@@ -136,3 +138,10 @@ assets.addAssetPath(插件的资源) -- 插件的资源
 
 创建：不会有冲突 --> 再创建一个AssetManager -->专门加载插件的资源  
 
+
+
+![image-20200701215044177](/Users/tian/Library/Application Support/typora-user-images/image-20200701215044177.png)
+
+
+
+![image-20200701215026560](/Users/tian/Library/Application Support/typora-user-images/image-20200701215026560.png)
